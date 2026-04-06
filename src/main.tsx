@@ -1,0 +1,42 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import {BrowserRouter, Routes, Route} from "react-router";
+import App from "./App.tsx";
+import RouteComponent from "./components/route/route.tsx"
+import CargoComponent from "./components/cargo/cargo.tsx";
+import DateComponent from "./components/date/date.tsx";
+import PhoneComponent from "./components/phone/phone.tsx";
+import FinalComponent from "./components/final/final.tsx";
+import "./index.css";
+import { DisplayGate, SDKInitOptions, SDKProvider } from "@tma.js/sdk-react";
+import { SDKProviderError } from "./components/sdk/SDKError.tsx";
+import { SDKProviderLoading } from "./components/sdk/SDKLoading.tsx";
+import { SDKInitialState } from "./components/sdk/SDKInit.tsx";
+
+
+const options: SDKInitOptions = {
+  acceptCustomStyles: true,
+  cssVars: true,
+  async: true,
+};
+
+
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+      <BrowserRouter>
+        <SDKProvider options={options}>
+          <DisplayGate error={SDKProviderError} loading={SDKProviderLoading} initial={SDKInitialState}>
+            <Routes>
+                <Route path="/" element={<App />} />
+                <Route path="route" element={<RouteComponent />} />
+                <Route path="date" element={<DateComponent />} />
+                <Route path="cargo" element={<CargoComponent />} />
+                <Route path="phone" element={<PhoneComponent />} />
+                <Route path="final" element={<FinalComponent />} />
+            </Routes>
+          </DisplayGate>
+        </SDKProvider>
+      </BrowserRouter>
+  </React.StrictMode>
+);

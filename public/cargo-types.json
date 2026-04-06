@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "id": "standard", "name": "Стандартный" },
+    { "id": "pallets", "name": "Паллеты" },
+    { "id": "documents", "name": "Документы" },
+    { "id": "long", "name": "Длинномерный" },
+    { "id": "other", "name": "Другое" }
+  ]
+}

@@ -1,9 +1,8 @@
 {
   "items": [
-    { "id": "standard", "name": "Стандартный" },
-    { "id": "pallets", "name": "Паллеты" },
-    { "id": "documents", "name": "Документы" },
-    { "id": "long", "name": "Длинномерный" },
-    { "id": "other", "name": "Другое" }
+    { "id": "standard", "name": "Стандартный", "description": "Обычные товары без спец. условий" },
+    { "id": "pallets", "name": "Паллеты", "description": "Паллетная перевозка" },
+    { "id": "docs", "name": "Документы", "description": "Лёгкие отправления" },
+    { "id": "other", "name": "Другое", "description": "Если тип груза нестандартный" }
   ]
 }

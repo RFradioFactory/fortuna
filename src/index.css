@@ -1,17 +1,8 @@
+@import './styles/telegram.css';
+
+/* Override default TWA styles if needed */
 :root {
-  --tg-theme-bg-color: #ffffff;
-  --tg-theme-text-color: #000000;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: var(--tg-theme-bg-color);
-  color: var(--tg-theme-text-color);
+  --tg-theme-bg-color: var(--bg);
+  --tg-theme-text-color: var(--text);
 }
 

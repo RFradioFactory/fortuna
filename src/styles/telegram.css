@@ -1,0 +1,534 @@
+/* =========================
+   Telegram WebApp-like UI
+   Light/Dark themes with manual toggle
+   ========================= */
+
+:root{
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+
+  /* tokens (light default) */
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface2: #f6f7f9;
+  --text: #111827;
+  --muted: #6b7280;
+  --muted2:#9ca3af;
+  --border: rgba(17,24,39,.10);
+
+  --accent:#2aabee;      /* Telegram-ish */
+  --accent2:#229ed9;
+  --accentText:#ffffff;
+
+  --danger:#ef4444;
+  --success:#10b981;
+  --warning:#f59e0b;
+
+  --shadow: 0 18px 40px rgba(17,24,39,.12);
+  --shadow2: 0 10px 24px rgba(17,24,39,.10);
+
+  --radius: 16px;
+  --radius2: 12px;
+  --btnH: 52px;
+
+  --safeBottom: 14px;
+  --safeTop: 0px;
+}
+
+/* auto dark via OS */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0b1220;
+    --surface: #0f172a;
+    --surface2: #111c33;
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.64);
+    --muted2: rgba(255,255,255,.45);
+    --border: rgba(255,255,255,.12);
+
+    --shadow: 0 20px 60px rgba(0,0,0,.45);
+    --shadow2: 0 12px 26px rgba(0,0,0,.30);
+  }
+}
+
+/* manual override */
+html[data-theme="light"]{
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface2: #f6f7f9;
+  --text: #111827;
+  --muted: #6b7280;
+  --muted2:#9ca3af;
+  --border: rgba(17,24,39,.10);
+
+  --shadow: 0 18px 40px rgba(17,24,39,.12);
+  --shadow2: 0 10px 24px rgba(17,24,39,.10);
+}
+html[data-theme="dark"]{
+  --bg: #0b1220;
+  --surface: #0f172a;
+  --surface2: #111c33;
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.64);
+  --muted2: rgba(255,255,255,.45);
+  --border: rgba(255,255,255,.12);
+
+  --shadow: 0 20px 60px rgba(0,0,0,.45);
+  --shadow2: 0 12px 26px rgba(0,0,0,.30);
+}
+
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+body{
+  margin:0;
+  font-family: var(--font);
+  background:
+    radial-gradient(900px 500px at 10% 0%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 55%),
+    radial-gradient(900px 600px at 90% 10%, color-mix(in oklab, var(--success) 16%, transparent), transparent 58%),
+    var(--bg);
+  color: var(--text);
+}
+
+/* ======= App Layout ======= */
+.app-container {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ======= Telegram top bar (fake WebApp) ======= */
+.tgbar{
+  height: 48px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 0 10px;
+  background: var(--surface);
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.backBtn{
+  width:34px;height:34px;border-radius:11px;
+  display:grid;place-items:center;
+  border:1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: color-mix(in oklab, var(--text) 4%, transparent);
+  color: color-mix(in oklab, var(--text) 75%, transparent);
+  cursor:pointer;
+  user-select:none;
+  transition: transform .15s ease, background .15s ease;
+}
+.backBtn:active{ transform: translateY(1px); }
+.backBtn:hover{ background: color-mix(in oklab, var(--text) 7%, transparent); }
+.tgtitle{
+  font-size:14px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tgright{
+  margin-left:auto;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.chipBtn{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: color-mix(in oklab, var(--text) 4%, transparent);
+  color: var(--muted);
+  cursor:pointer;
+  user-select:none;
+}
+.chipBtn:hover{ background: color-mix(in oklab, var(--text) 7%, transparent); }
+
+/* ======= Screens ======= */
+.screen{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-height: calc(100vh - 48px);
+}
+
+.body{
+  padding: 14px 14px 96px 14px; /* space for main button */
+  flex: 1;
+  overflow:auto;
+}
+
+h1{
+  font-size:22px;
+  margin: 6px 0 8px 0;
+  letter-spacing:-.2px;
+  line-height:1.15;
+}
+p{
+  margin: 0 0 14px 0;
+  color: var(--muted);
+  font-size:13.5px;
+  line-height:1.45;
+}
+
+.card{
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: 0 10px 24px color-mix(in oklab, #000 10%, transparent);
+}
+.card + .card{ margin-top:12px; }
+
+.sectionTitle{
+  font-weight:900;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.info{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+  color: color-mix(in oklab, var(--text) 82%, transparent);
+  font-size:13px;
+  line-height:1.4;
+}
+.badge{
+  font-size:12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border:1px solid var(--border);
+  background: color-mix(in oklab, var(--text) 4%, transparent);
+  color: var(--muted);
+  white-space:nowrap;
+  flex:0 0 auto;
+}
+.badge.ok{
+  border-color: color-mix(in oklab, var(--success) 35%, var(--border));
+  background: color-mix(in oklab, var(--success) 12%, transparent);
+  color: color-mix(in oklab, var(--success) 90%, transparent);
+  font-weight:900;
+}
+
+/* ======= Inputs ======= */
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top: 12px;
+  position:relative;
+}
+.label{
+  font-size:12px;
+  color: var(--muted);
+}
+input{
+  width:100%;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in oklab, var(--border) 92%, transparent);
+  background: var(--surface2);
+  color: var(--text);
+  outline:none;
+  font-size:14px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+input::placeholder{ color: var(--muted2); }
+input:focus{
+  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+}
+
+.errorText{
+  margin-top:6px;
+  color: color-mix(in oklab, var(--danger) 80%, transparent);
+  font-size:12px;
+  display:none;
+}
+.field.invalid .errorText{ display:block; }
+.field.invalid input{ border-color: color-mix(in oklab, var(--danger) 55%, transparent); }
+
+/* ======= Autocomplete ======= */
+.ac{
+  position:absolute;
+  left:0; right:0;
+  top: calc(100% + 6px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow2);
+  overflow:hidden;
+  z-index:20;
+  display:none;
+  max-height: 240px;
+}
+.ac.show{ display:block; animation: fadeIn .12s ease-out; }
+@keyframes fadeIn{ from{opacity:0; transform: translateY(-4px);} to{opacity:1; transform:none;} }
+.acItem{
+  padding: 10px 12px;
+  cursor:pointer;
+  font-size:13.5px;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.acItem:last-child{ border-bottom:none; }
+.acItem:hover, .acItem.active{
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+.acCity{ font-weight:800; }
+.acRegion{ color: var(--muted); font-size:12px; margin-left:auto; }
+
+/* ======= Radio list ======= */
+.radio{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
+.radio button{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+  background: var(--surface2);
+  color: var(--text);
+  cursor:pointer;
+  text-align:left;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.radio button:hover{
+  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--accent) 7%, var(--surface2));
+  border-color: color-mix(in oklab, var(--accent) 24%, var(--border));
+}
+.rb{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid color-mix(in oklab, var(--text) 20%, transparent);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+.rb::after{
+  content:"";
+  width:9px;height:9px;border-radius:50%;
+  background: transparent;
+}
+.radio button.selected .rb{
+  border-color: color-mix(in oklab, var(--accent) 90%, transparent);
+}
+.radio button.selected .rb::after{
+  background: color-mix(in oklab, var(--accent) 90%, transparent);
+}
+.radio small{
+  display:block;
+  color: var(--muted);
+  font-size:12px;
+  margin-top:2px;
+}
+
+/* ======= MainButton (Telegram-like) ======= */
+.mainButtonWrap{
+  position:sticky;
+  left:0; right:0; bottom:0;
+  padding: 10px 12px calc(var(--safeBottom) + 4px) 12px;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--bg) 0%, transparent),
+    color-mix(in oklab, var(--bg) 88%, transparent) 28%,
+    color-mix(in oklab, var(--bg) 100%, transparent)
+  );
+  border-top: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  z-index:10;
+}
+.mainButton{
+  width:100%;
+  height: var(--btnH);
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  color: var(--accentText);
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:.1px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: 0 14px 26px color-mix(in oklab, var(--accent) 22%, transparent);
+  transition: transform .15s ease, filter .15s ease, opacity .15s ease;
+}
+.mainButton:active{ transform: translateY(1px); }
+.mainButton.disabled{
+  opacity:.45;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+/* ======= Center screens ======= */
+.center{
+  flex: 1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding: 22px 18px 96px 18px;
+  gap:12px;
+}
+.bigicon{
+  width:72px;height:72px;border-radius:22px;
+  display:grid;place-items:center;
+  border:1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 10px 24px color-mix(in oklab, #000 10%, transparent);
+  font-size:34px;
+}
+.spinner{
+  width:26px;height:26px;border-radius:50%;
+  border:3px solid color-mix(in oklab, var(--text) 14%, transparent);
+  border-top-color: color-mix(in oklab, var(--text) 55%, transparent);
+  animation: spin 1s linear infinite;
+  margin-top: 6px;
+}
+@keyframes spin{ to{ transform: rotate(360deg);} }
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size:12.5px;
+  color: color-mix(in oklab, var(--text) 82%, transparent);
+  line-height:1.45;
+  white-space:pre-line;
+}
+
+/* ======= Calendar modal ======= */
+.modalOverlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.28);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:50;
+}
+html[data-theme="dark"] .modalOverlay{ background: rgba(0,0,0,.50); }
+.modalOverlay.show{ display:flex; animation: overlayIn .12s ease-out; }
+@keyframes overlayIn{ from{ opacity:0;} to{opacity:1;} }
+
+.sheet{
+  width:100%;
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  animation: sheetIn .18s ease-out;
+}
+@keyframes sheetIn{ from{ transform: translateY(14px); opacity:.7;} to{ transform:none; opacity:1;} }
+.sheetHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom: 10px;
+}
+.sheetTitle{
+  font-weight:900;
+  font-size:14px;
+}
+.sheetClose{
+  border:1px solid var(--border);
+  background: color-mix(in oklab, var(--text) 4%, transparent);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size:12px;
+  color: var(--muted);
+  cursor:pointer;
+}
+.calHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin: 10px 0 8px;
+}
+.calNav{
+  display:flex; gap:8px; align-items:center;
+}
+.calBtn{
+  width:34px;height:34px;border-radius:11px;
+  border:1px solid var(--border);
+  background: var(--surface2);
+  cursor:pointer;
+  display:grid;place-items:center;
+  color: var(--text);
+  font-weight:900;
+}
+.calMonth{
+  font-weight:900;
+  font-size:14px;
+}
+.calGrid{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:6px;
+  margin-top: 8px;
+}
+.dow{
+  text-align:center;
+  font-size:11px;
+  color: var(--muted);
+  padding: 4px 0;
+  font-weight:800;
+}
+.day{
+  height:40px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: var(--surface2);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  color: var(--text);
+  user-select:none;
+}
+.day.muted{ opacity:.45; cursor:not-allowed; }
+.day.today{ border-color: color-mix(in oklab, var(--accent) 35%, var(--border)); }
+.day.selected{
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+}
+.sheetFooter{
+  display:flex;
+  gap:10px;
+  margin-top: 12px;
+}
+.btnSmall{
+  flex:1;
+  height:44px;
+  border-radius: 14px;
+  border:1px solid var(--border);
+  background: var(--surface2);
+  cursor:pointer;
+  font-weight:900;
+  color: var(--text);
+}
+.btnSmall.primary{
+  border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  color: var(--accentText);
+}

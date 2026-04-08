@@ -1,45 +1,33 @@
 import { useEffect } from "react";
 import { useInitData, useMiniApp } from "@tma.js/sdk-react";
+import { useNavigate } from "react-router";
 
 import "./App.css";
-import {useNavigate} from "react-router";
-import {BottomBar, MainButton, SecondaryButton} from "@twa-dev/sdk/react";
 
 function App() {
   const initData = useInitData();
-
   const miniApp = useMiniApp();
   const navigate = useNavigate();
 
   useEffect(() => {
     miniApp.ready();
-  }, [miniApp]);
-
-  const handleClickClose = () => {
-    miniApp.close()
-  }
-
-  const handleClickRoute = () => {
-    navigate('/route')
-  }
+    
+    // Apply saved theme on app start
+    const savedTheme = localStorage.getItem('theme_mode') || 'auto';
+    if (savedTheme === 'auto') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    
+    // Redirect to loading screen on initial load
+    navigate('/loading');
+  }, [miniApp, navigate]);
 
   return (
-    <>
-      <h1>Telegram Mini App</h1>
-
-        <p>
-          Это приложение для быстрого оформления заявок в Fortuna Express.
-        </p>
-        <p>А вот тебе сразу данные твоего пользователя, без деплоя на сервер:</p>
-        <pre>{JSON.stringify(initData?.user, null, 2)}</pre>
-
-      <BottomBar>
-        <MainButton text="Оформить заявку на грузоперевозку" onClick={() => handleClickRoute()} />
-        <SecondaryButton text="Закрыть" position="bottom" onClick={() => handleClickClose()} />
-      </BottomBar>
-
-
-    </>
+    <div className="app-container">
+      {/* App content will be rendered by router */}
+    </div>
   );
 }
 

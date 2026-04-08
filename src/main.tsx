@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import {BrowserRouter, Routes, Route} from "react-router";
 import App from "./App.tsx";
+import LoadingScreen from "./components/loading/Loading.tsx";
+import MainScreen from "./components/main/Main.tsx";
 import RouteComponent from "./components/route/route.tsx"
 import CargoComponent from "./components/cargo/cargo.tsx";
 import DateComponent from "./components/date/date.tsx";
@@ -29,6 +31,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <DisplayGate error={SDKProviderError} loading={SDKProviderLoading} initial={SDKInitialState}>
             <Routes>
                 <Route path="/" element={<App />} />
+                <Route path="/loading" element={<LoadingScreen />} />
+                <Route path="/main" element={<MainScreen />} />
                 <Route path="route" element={<RouteComponent />} />
                 <Route path="date" element={<DateComponent />} />
                 <Route path="cargo" element={<CargoComponent />} />

@@ -1,30 +1,312 @@
-# React + TypeScript + Vite
+# Fortuna Express — Telegram Mini App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## О проекте
 
-Currently, two official plugins are available:
+Fortuna Express — это Telegram Mini Application для логистической компании, специализирующейся на перевозке грузов. Приложение позволяет пользователям создавать заявки на перевозку, отслеживать их статус, управлять профилем, просматривать документы и информацию о филиалах компании.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Основные возможности
 
-## Expanding the ESLint configuration
+- 📱 **Создание заявок на перевозку грузов** — пошаговый процесс оформления заявки (маршрут → тип груза → дата → контакты)
+- 📋 **Личный кабинет** — просмотр истории заявок, управление профилем
+- 📄 **Документы** — доступ к договорам, заявкам и реквизитам компании
+- 🏢 **Филиалы** — информация об адресах и контактах всех филиалов компании
+- 👤 **Профиль пользователя** — редактирование личных данных (ФИО, email)
+- 🌙 **Темная/светлая тема** — автоматическое определение темы Telegram или ручное переключение
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Технологии и инструменты
 
-- Configure the top-level `parserOptions` property like this:
+### Frontend
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+- **React 18** — библиотека для построения пользовательского интерфейса
+- **TypeScript** — типизация JavaScript для повышения надежности кода
+- **Vite** — современный сборщик для быстрой разработки
+- **React Router** — клиентская маршрутизация в приложении
+- **@tma.js/sdk-react** — SDK для работы с Telegram Mini Apps API
+
+### Архитектурные решения
+
+- **Компонентный подход** — UI разбит на переиспользуемые компоненты
+- **Централизация типов** — все TypeScript типы вынесены в `src/types/`
+- **Утилиты** — общие функции (форматирование дат, переключение темы) в `src/utils/`
+- **API сервис** — единый сервис для работы с бекендом в `src/services/api.ts`
+- **LocalStorage** — хранение данных пользователя и состояния заявки
+
+## Архитектура проекта
+
+### Структура директорий
+
+```
+src/
+├── components/          # React компоненты
+│   ├── loading/        # Экран загрузки и инициализации
+│   ├── main/           # Главный экран
+│   ├── home/           # Личный кабинет
+│   ├── route/          # Выбор маршрута
+│   ├── cargo/          # Выбор типа груза
+│   ├── date/           # Выбор даты отправки
+│   ├── phone/          # Ввод контактных данных
+│   ├── final/          # Итоговый экран отправки заявки
+│   ├── orders/         # Список заявок
+│   ├── profile/        # Профиль пользователя
+│   ├── documents/      # Документы компании
+│   ├── branches/       # Филиалы компании
+│   ├── calendar/       # Календарь для выбора даты
+│   ├── autocomplete/   # Автозаполнение для городов
+│   ├── error/          # Компонент ошибок
+│   └── sdk/            # Компоненты для Telegram SDK
+├── services/           # API сервисы
+│   └── api.ts         # Класс для работы с API
+├── types/              # TypeScript типы
+│   ├── api.ts         # Типы для API
+│   ├── order.ts       # Типы для заявок
+│   ├── ui.ts          # UI типы
+│   ├── branch.ts      # Типы для филиалов
+│   └── index.ts       # Экспорт всех типов
+├── utils/              # Утилиты
+│   ├── theme.ts       # Переключение темы
+│   └── date.ts        # Форматирование дат
+├── styles/             # Стили
+│   └── telegram.css   # Стили для Telegram Mini App
+├── App.tsx            # Корневой компонент
+├── main.tsx           # Точка входа и маршрутизация
+└── index.css          # Глобальные стили
+
+public/
+├── docs/              # Документы компании
+├── cities.json        # Список городов
+├── cargo-types.json   # Типы грузов
+├── orders.json        # Данные заявок (mock)
+└── initUser.json      # Данные инициализации пользователя (mock)
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Логика работы приложения
+
+### 1. Инициализация и авторизация
+
+При запуске приложения пользователь попадает на экран загрузки (`/loading`):
+
+1. **Получение InitData** — Telegram передает данные пользователя через `@tma.js/sdk-react`
+2. **Отправка на бекенд** — InitData отправляется на `/api/user/init`
+3. **Определение статуса** — бекенд возвращает статус пользователя:
+    - `new` — новый пользователь → переход на `/main` для создания первой заявки
+    - `existing` — существующий пользователь → переход на `/home` (личный кабинет)
+4. **Сохранение токена** — JWT токен сохраняется в localStorage
+
+### 2. Процесс создания заявки
+
+Пользователь проходит через несколько шагов для создания заявки:
+
+**Шаг 1: Выбор маршрута (`/route`)**
+- Выбор города отправки из списка (автозаполнение)
+- Выбор города назначения
+- Сохранение ID городов в localStorage
+
+**Шаг 2: Выбор типа груза (`/cargo`)**
+- Выбор типа груза из списка
+- Ввод веса груза (кг)
+- Валидация веса (число > 0)
+
+**Шаг 3: Выбор даты отправки (`/date`)**
+- Выбор режима: "Как можно скорее" или конкретная дата
+- При выборе даты — использование календаря
+- В зависимости от статуса пользователя:
+    - `existing` → переход на `/final` (телефон уже есть)
+    - `new` → переход на `/phone` (нужно ввести телефон)
+
+**Шаг 4: Ввод контактов (`/phone`)** — только для новых пользователей
+- Ручной ввод номера телефона
+- Или использование Telegram API для получения контакта
+- Валидация номера (минимум 10 цифр)
+
+**Шаг 5: Отправка заявки (`/final`)**
+- Сбор всех данных из localStorage
+- Отправка на `/api/order/create`
+- Отображение результата (успех/ошибка)
+- Очистка localStorage
+- Переход в личный кабинет
+
+### 3. Личный кабинет (`/home`)
+
+Пользователь может:
+
+- **Просмотреть профиль** — перейти на `/profile` для редактирования личных данных
+- **Мои заявки** — список всех заявок с сортировкой
+- **Документы** — доступ к документам компании
+- **Филиалы** — адреса и контакты филиалов
+- **Новая заявка** — начать процесс создания заявки
+
+### 4. Управление профилем (`/profile`)
+
+- Просмотр текущих данных (ФИО, email)
+- Режим редактирования для изменения данных
+- Сохранение изменений через `/api/user/update`
+- Автоматическое сохранение в localStorage
+
+### 5. Список заявок (`/orders`)
+
+- Загрузка заявок из `/api/user/orders` (или из mock файла)
+- Отображение с городами и типами грузов
+- Сортировка по дате создания или дате отправки
+- Форматирование дат в ДД.ММ.ГГГГ
+
+### 6. Документы (`/documents`)
+
+- Категории документов:
+    - Документы для оформления отправки и получения грузов
+    - Договоры и оферты
+    - Реквизиты и учредительные документы
+    - Прочие документы
+- Открытие документов в новой вкладке
+
+### 7. Филиалы (`/branches`)
+
+- Список всех филиалов компании
+- Адрес, телефон, email каждого филиала
+- Кнопки для открытия карты и звонка
+
+## API Endpoints
+
+### Пользователь
+
+- `POST /api/user/init` — инициализация пользователя
+    - Вход: `{ initData: string }`
+    - Выход: `{ userStatus: { status, userData, token } }`
+
+
+- `POST /api/user/update` — обновление профиля пользователя
+    - Заголовок: `Authorization: Bearer {token}`
+    - Вход: `UserProfile`
+    - Выход: `{ success: boolean }`
+
+### Заявки
+
+- `POST /api/order/create` — создание заявки
+    - Заголовок: `Authorization: Bearer {token}`
+    - Вход: `ApplicationData`
+    - Выход: `{ orderId, status, message }`
+
+- `GET /api/user/orders` — получение заявок пользователя
+    - Заголовок: `Authorization: Bearer {token}`
+    - Выход: `{ items: Order[] }`
+
+### Справочники
+
+- `GET /api/cities` — получение списка городов
+    - Выход: `{ items: City[] }`
+
+- `GET /api/cargo-types` — получение типов грузов
+    - Выход: `{ items: CargoType[] }`
+
+## Установка и запуск
+
+### Требования
+
+- Node.js 18+
+- npm или yarn
+
+### Установка
+
+```bash
+# Клонирование репозитория
+git clone <repository-url>
+cd frontend
+
+# Установка зависимостей
+npm install
+```
+
+### Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу `http://localhost:5173`
+
+### Сборка для продакшена
+
+```bash
+npm run build
+```
+
+Собранные файлы будут в директории `dist/`
+
+### Предпросмотр продакшн-сборки
+
+```bash
+npm run preview
+```
+
+## Работа с Telegram Mini App
+
+### Локальная разработка
+
+Для локальной разработки используйте Telegram Web App:
+
+1. Откройте Telegram Web App: https://web.telegram.org/a/
+2. В настройках разработчика включите режим разработчика
+3. Используйте URL вашего локального сервера
+
+### Деплой
+
+Для деплоя в Telegram:
+
+1. Соберите проект: `npm run build`
+2. Загрузите файлы из `dist/` на ваш хостинг
+3. Укажите URL в настройках бота через @BotFather
+
+## Конфигурация
+
+### API URL
+
+Измените базовый URL API в `src/services/api.ts`:
+
+```typescript
+private baseURL = 'https://backend-api.com';
+```
+
+### Темы
+
+Приложение поддерживает три темы:
+- `auto` — автоматическое определение темы Telegram
+- `light` — светлая тема
+- `dark` — темная тема
+
+Тема сохраняется в localStorage под ключом `theme_mode`.
+
+## Хранение данных
+
+### LocalStorage
+
+- `initData` — данные инициализации от Telegram
+- `userProfile` — профиль пользователя
+- `userStatus` — статус пользователя (new/existing)
+- `jwt_token` — JWT токен авторизации
+- `theme_mode` — текущая тема
+- `cityFrom` — ID города отправки
+- `cityTo` — ID города назначения
+- `cargoType` — тип груза
+- `cargoWeight` — вес груза
+- `dateMode` — режим даты (asap/pick)
+- `selectedDate` — выбранная дата
+- `phone` — номер телефона
+
+## Mock данные
+
+Для разработки используются mock файлы в `public/`:
+
+- `cities.json` — список городов России
+- `cargo-types.json` — типы грузов
+- `orders.json` — примеры заявок
+- `initUser.json` — данные для инициализации пользователя
+
+## Доступные скрипты
+
+- `npm run dev` — запуск сервера разработки
+- `npm run build` — сборка для продакшена
+- `npm run preview` — предпросмотр продакшн-сборки
+- `npm run lint` — проверка кода ESLint
+
+## Лицензия
+
+© 2026 Все права защищены.

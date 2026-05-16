@@ -46,7 +46,7 @@ class ApiService {
     }
 
     const data = await response.json();
-    
+
     // Сохраняем токен если получили
     if (data.userStatus.token) {
       this.setToken(data.userStatus.token);
@@ -87,6 +87,47 @@ class ApiService {
 
     if (!response.ok) {
       throw new Error(`Failed to submit application: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getCargoTypes(): Promise<any> {
+    const response = await this.request('/api/cargo-types', {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get cargo types: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getUserOrders(): Promise<any> {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No token available');
+    }
+
+    const response = await this.request('/api/user/orders', {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get user orders: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  async getCities(): Promise<any> {
+    const response = await this.request('/api/cities', {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get cities: ${response.statusText}`);
     }
 
     return response.json();

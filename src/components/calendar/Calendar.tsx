@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface CalendarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect: (date: Date) => void;
-  initialDate?: Date;
-}
+import { CalendarProps } from '../../types';
 
 const Calendar: React.FC<CalendarProps> = ({ isOpen, onClose, onSelect, initialDate }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -33,12 +27,6 @@ const Calendar: React.FC<CalendarProps> = ({ isOpen, onClose, onSelect, initialD
     return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   };
 
-  const fmtDate = (d: Date) => {
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yy = d.getFullYear();
-    return `${dd}.${mm}.${yy}`;
-  };
 
   const handlePrevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));

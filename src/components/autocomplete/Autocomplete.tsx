@@ -1,19 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-
-interface City {
-  id: string;
-  name: string;
-  region?: string;
-}
-
-interface AutocompleteProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSelect: (city: City) => void;
-  placeholder?: string;
-  label?: string;
-  cities: City[];
-}
+import { City, AutocompleteProps } from '../../types';
 
 const Autocomplete: React.FC<AutocompleteProps> = ({
   value,
@@ -29,6 +15,7 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
   const [isValid, setIsValid] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const suppressNextOpenRef = useRef(false);
 
   // Normalize helper
   const normalize = (s: string) => (s || '').toString().trim().toLowerCase().replace(/ё/g,'е');
@@ -55,7 +42,12 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
     if (value.length >= 3) {
       const items = findCities(value);
       setSuggestions(items);
-      setIsOpen(items.length > 0);
+      if (suppressNextOpenRef.current) {
+        suppressNextOpenRef.current = false;
+        setIsOpen(false);
+      } else {
+        setIsOpen(items.length > 0);
+      }
       setActiveIndex(0);
     } else {
       setSuggestions([]);
@@ -65,13 +57,16 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    suppressNextOpenRef.current = false;
     onChange(newValue);
     setIsValid(false); // Mark as not picked until user selects from list
   };
 
   const handleSelectCity = (city: City) => {
+    suppressNextOpenRef.current = true;
     onChange(city.name);
     onSelect(city);
+    setSuggestions([]);
     setIsOpen(false);
     setIsValid(true);
   };
@@ -107,14 +102,14 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
 
   // Close when clicking outside
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
 
   return (
@@ -135,7 +130,11 @@ const Autocomplete: React.FC<AutocompleteProps> = ({
           <div
             key={city.id}
             className={`acItem ${index === activeIndex ? 'active' : ''}`}
-            onClick={() => handleSelectCity(city)}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSelectCity(city);
+            }}
           >
             <span className="acCity">{city.name}</span>
             <span className="acRegion">{city.region || ''}</span>

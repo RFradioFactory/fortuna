@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-
-interface ApplicationData {
-  cityFrom: string;
-  cityTo: string;
-  cargoType: string;
-  cargoWeight: string;
-  dateMode: string;
-  selectedDate: string | null;
-  phone: string;
-}
+import { fmtDate } from '../../utils/date';
+import { ApplicationData } from '../../types';
+import { toggleTheme } from "../../utils/theme";
+import { apiService } from '../../services/api';
 
 const FinalComponent = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -30,35 +24,32 @@ const FinalComponent = () => {
 
     setApplicationData(data);
 
+    // Send application data to server
+    // const submitApplication = async () => {
+    //   try {
+    //     const response = await apiService.submitApplication(data);
+    //     setStatus('success');
+    //   } catch (error) {
+    //     console.error('Error submitting application:', error);
+    //     setStatus('error');
+    //   }
+    // };
+    //
+    // submitApplication();
+
     // Simulate API call
     const timer = setTimeout(() => {
-      // In real app, this would be an actual API call
       try {
-        // For demo purposes, we'll simulate success
-        // In production, you would make an actual fetch request here
-        console.log('Sending application data:', data);
-        
-        setStatus('error');
-        // Don't clear localStorage immediately in case user wants to see the data
+        setStatus('success');
       } catch (error) {
         console.error('Error submitting application:', error);
         setStatus('error');
       }
-    }, 1500); // Simulate network delay
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const fmtDate = (dateString: string) => {
-    if (!dateString) return '—';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '—';
-    
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const yy = date.getFullYear();
-    return `${dd}.${mm}.${yy}`;
-  };
 
   const buildSuccessText = () => {
     if (!applicationData) return '...';
@@ -73,12 +64,12 @@ const FinalComponent = () => {
     const weight = applicationData.cargoWeight;
 
     return `Заявка №${id}
-Маршрут: ${from} → ${to}
-Отправка: ${when}
-Груз: ${cargo}
-Объём: ${weight}
-Статус: Принята`;
-  };
+      Маршрут: ${from} → ${to}
+      Отправка: ${when}
+      Груз: ${cargo}
+      Объём: ${weight}
+      Статус: Принята`;
+        };
 
   const handleBackToMain = () => {
     // Clear all application data
@@ -89,9 +80,9 @@ const FinalComponent = () => {
     localStorage.removeItem('dateMode');
     localStorage.removeItem('selectedDate');
     localStorage.removeItem('phone');
-    localStorage.removeItem('phoneRequired');
     
-    navigate('/main');
+    // После успешной отправки заявки переходим в личный кабинет
+    navigate('/home');
   };
 
   const handleRetry = () => {
@@ -102,18 +93,6 @@ const FinalComponent = () => {
     }, 1000);
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
   if (status === 'loading') {
     return (
@@ -198,7 +177,7 @@ const FinalComponent = () => {
         </div>
 
         <div className="mainButtonWrap">
-          <div className="mainButton" onClick={handleBackToMain}>На главную</div>
+          <div className="mainButton" onClick={handleBackToMain}>В личный кабинет</div>
         </div>
       </div>
     </div>

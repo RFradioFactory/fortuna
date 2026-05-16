@@ -1,50 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
-
-interface CargoType {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-interface CargoData {
-  type: string;
-  weight: string;
-}
+import ErrorMessage from "../error/ErrorMessage";
+import { toggleTheme } from "../../utils/theme";
+import { CargoType, CargoData } from "../../types";
 
 const CargoComponent = () => {
   const [cargoTypes, setCargoTypes] = useState<CargoType[]>([]);
   const [cargoData, setCargoData] = useState<CargoData>({
-    type: 'standard',
+    type: '',
     weight: ''
   });
   const [isWeightValid, setIsWeightValid] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Load cargo types from JSON or use default
-     const defaultCargoTypes: CargoType[] = [
-     ];
-    //   { id: 'standard', name: 'Стандартный', description: 'Обычные товары без спец. условий' },
-    //   { id: 'pallets', name: 'Паллеты', description: 'Паллетная перевозка' },
-    //   { id: 'docs', name: 'Документы', description: 'Лёгкие отправления' },
-    //   { id: 'other', name: 'Другое', description: 'Если тип груза нестандартный' }
-    // ];
-    
-    setCargoTypes(defaultCargoTypes);
+  const loadCargoTypes = useCallback(async () => {
+    try {
+      // TODO: Backend request for cargo types
+      // const response = await apiService.getCargoTypes();
 
-    // Try to load from JSON if available
-    fetch('./cargo-types.json')
-      .then(response => response.json())
-      .then(data => {
-        if (data.items && data.items.length > 0) {
-          setCargoTypes(data.items);
-        }
-      })
-      .catch(error => {
-        console.log('Using default cargo types, JSON not found:', error);
-      });
+      // Current implementation: load from local JSON file
+      const response = await fetch('./cargo-types.json');
+      const data = await response.json();
+      if (data.items && data.items.length > 0) {
+        setCargoTypes(data.items);
+      }
+    } catch (err) {
+      console.error('Failed to load cargo types:', err);
+      setError('Не удалось загрузить типы груза');
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCargoTypes();
 
     // Load saved data from localStorage
     const savedType = localStorage.getItem('cargoType');
@@ -56,7 +45,7 @@ const CargoComponent = () => {
       setCargoData(prev => ({ ...prev, weight: savedWeight }));
       setIsWeightValid(savedWeight.trim().length > 0);
     }
-  }, []);
+  }, [loadCargoTypes]);
 
   const handleCargoTypeSelect = (type: string) => {
     setCargoData(prev => ({ ...prev, type }));
@@ -80,18 +69,6 @@ const CargoComponent = () => {
     navigate('/route');
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
   const isFormValid = () => {
     return cargoData.type && isWeightValid;
@@ -111,6 +88,15 @@ const CargoComponent = () => {
         </div>
 
         <div className="body">
+          {error && (
+            <ErrorMessage
+              message={error}
+              onRetry={() => {
+                setError(null);
+                loadCargoTypes();
+              }}
+            />
+          )}
           <div className="card">
             <div className="sectionTitle">Параметры груза</div>
             <p>Минимум данных – для быстрой отправки.</p>
@@ -147,7 +133,7 @@ const CargoComponent = () => {
 
             <div style={{marginTop: '14px'}} className="info">
               <span className="badge">Важно</span>
-              <div>Габариты и дополнительные условия не требуются в MVP – их уточнит менеджер при необходимости.</div>
+              <div>Габариты и дополнительные условия не обязательны – их уточнит менеджер при необходимости.</div>
             </div>
           </div>
         </div>

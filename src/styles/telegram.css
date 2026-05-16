@@ -96,7 +96,7 @@ body{
   flex-direction: column;
 }
 
-/* ======= Telegram top bar (fake WebApp) ======= */
+/* ======= Telegram top bar ======= */
 .tgbar{
   height: 48px;
   display:flex;

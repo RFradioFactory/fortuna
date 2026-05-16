@@ -1,0 +1,18 @@
+{
+  "userStatus":
+    {
+    "status": "new",
+    "userData":
+      {
+      "id": "123456",
+      "userProfile":
+        {
+        "firstName": "John",
+        "lastName": "Doe",
+        "middleName": "Doe",
+        "email": "john.doe@example.com"
+        }
+      },
+    "token": "hbrfvjnfirnfirefinreifnerinf"
+    }
+}

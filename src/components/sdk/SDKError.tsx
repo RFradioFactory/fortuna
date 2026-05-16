@@ -1,6 +1,4 @@
-interface SDKProviderErrorProps {
-  error: unknown;
-}
+import { SDKProviderErrorProps } from '../../types';
 
 export function SDKProviderError({ error }: SDKProviderErrorProps) {
   return (

@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import Calendar from '../calendar/Calendar';
-
-interface DateData {
-  mode: 'asap' | 'pick';
-  value: Date | null;
-}
+import { fmtDateFromObject } from '../../utils/date';
+import { toggleTheme } from '../../utils/theme';
+import { DateData } from '../../types';
 
 const DateComponent = () => {
   const [dateData, setDateData] = useState<DateData>({
@@ -13,15 +11,14 @@ const DateComponent = () => {
     value: null
   });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [phoneRequired, setPhoneRequired] = useState(true);
-
+  const [userStatus, setUserStatus] = useState('new');
   const navigate = useNavigate();
 
   useEffect(() => {
     // Load saved data from localStorage
     const savedMode = localStorage.getItem('dateMode') as 'asap' | 'pick' | null;
     const savedDate = localStorage.getItem('selectedDate');
-    const savedPhoneRequired = localStorage.getItem('phoneRequired');
+    const savedUserStatus = localStorage.getItem('userStatus');
     
     if (savedMode) {
       setDateData(prev => ({ ...prev, mode: savedMode }));
@@ -32,17 +29,12 @@ const DateComponent = () => {
         setDateData(prev => ({ ...prev, value: date }));
       }
     }
-    if (savedPhoneRequired !== null) {
-      setPhoneRequired(savedPhoneRequired === 'true');
+    if (savedUserStatus) {
+      setUserStatus(savedUserStatus);
     }
+
   }, []);
 
-  const fmtDate = (d: Date) => {
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yy = d.getFullYear();
-    return `${dd}.${mm}.${yy}`;
-  };
 
   const handleDateModeSelect = (mode: 'asap' | 'pick') => {
     setDateData(prev => ({ ...prev, mode, value: mode === 'asap' ? null : prev.value }));
@@ -64,14 +56,11 @@ const DateComponent = () => {
   };
 
   const handleSubmit = () => {
-    // Save phone requirement state
-    localStorage.setItem('phoneRequired', phoneRequired.toString());
-    
-    // Navigate based on phone requirement
-    if (phoneRequired) {
-      navigate('/phone');
-    } else {
+    if (userStatus === 'existing') {
       navigate('/final');
+    }
+    else {
+      navigate('/phone');
     }
   };
 
@@ -79,24 +68,7 @@ const DateComponent = () => {
     navigate('/cargo');
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
-  const togglePhoneRequired = () => {
-    const newRequired = !phoneRequired;
-    setPhoneRequired(newRequired);
-    localStorage.setItem('phoneRequired', newRequired.toString());
-  };
 
   const isFormValid = () => {
     return dateData.mode === 'asap' || (dateData.mode === 'pick' && dateData.value);
@@ -147,7 +119,7 @@ const DateComponent = () => {
                 id="dateValue"
                 readOnly
                 placeholder="Нажмите, чтобы выбрать дату"
-                value={dateData.value ? fmtDate(dateData.value) : ''}
+                value={dateData.value ? fmtDateFromObject(dateData.value) : ''}
                 onClick={handleOpenCalendar}
               />
             </div>
@@ -157,14 +129,6 @@ const DateComponent = () => {
               <div>Даже если дата неизвестна, заявку можно отправить – менеджер уточнит детали.</div>
             </div>
 
-            <div className="card" style={{marginTop: '12px', background: 'var(--surface2)'}}>
-              <div className="sectionTitle">Демо ветки "Телефон"</div>
-              <p style={{marginBottom: '10px'}}>Для демонстрации можно включить/выключить запрос телефона.</p>
-              <div style={{display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap'}}>
-                <span className="badge">Телефон: {phoneRequired ? 'включён' : 'выключен'}</span>
-                <div className="chipBtn" onClick={togglePhoneRequired}>Переключить</div>
-              </div>
-            </div>
           </div>
         </div>
 

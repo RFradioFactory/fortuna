@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useMiniApp } from '@tma.js/sdk-react';
+import { toggleTheme } from '../../utils/theme';
+import { TelegramContactResult } from '../../types';
+
+const normalizePhone = (p: string) => (p || '').replace(/[^\d+]/g, '').trim();
+
+const validatePhone = (phoneNumber: string) => {
+  const p = normalizePhone(phoneNumber);
+  const digits = (p.match(/\d/g) || []).length;
+  return digits >= 10;
+};
 
 const PhoneComponent = () => {
   const [phone, setPhone] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const [isRequestingContact, setIsRequestingContact] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
   const miniApp = useMiniApp();
   const navigate = useNavigate();
 
@@ -19,16 +31,6 @@ const PhoneComponent = () => {
     }
   }, [miniApp]);
 
-  const normalizePhone = (p: string) => {
-    return (p || '').replace(/[^\d+]/g, '').trim();
-  };
-
-  const validatePhone = (phoneNumber: string) => {
-    const p = normalizePhone(phoneNumber);
-    const digits = (p.match(/\d/g) || []).length;
-    return digits >= 10;
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPhone(value);
@@ -38,16 +40,25 @@ const PhoneComponent = () => {
   };
 
   const handleRequestContact = () => {
+    setContactError(null);
+    setIsRequestingContact(true);
+
     miniApp.requestContact()
-      .then(result => {
-        const phoneNumber = result.contact.phoneNumber;
+      .then((result: unknown) => {
+        const r = result as TelegramContactResult;
+        const phoneNumber = r?.contact?.phoneNumber;
+        if (!phoneNumber) {
+          throw new Error('No phone number returned');
+        }
         setPhone(phoneNumber);
         setIsValid(validatePhone(phoneNumber));
         localStorage.setItem('phone', phoneNumber);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error requesting contact:', error);
-      });
+        setContactError('Не удалось получить номер из Telegram. Введите номер вручную.');
+      })
+      .finally(() => setIsRequestingContact(false));
   };
 
   const handleSubmit = () => {
@@ -60,18 +71,6 @@ const PhoneComponent = () => {
     navigate('/date');
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
   const isButtonDisabled = !isValid;
 
@@ -90,6 +89,20 @@ const PhoneComponent = () => {
           <div className="card">
             <div className="sectionTitle">Контактный телефон</div>
             <p>Нужен, чтобы менеджер мог связаться с вами по заявке.</p>
+
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <button
+                type="button"
+                className="btnSmall primary"
+                onClick={handleRequestContact}
+                disabled={isRequestingContact}
+              >
+                {isRequestingContact ? 'Запрашиваем…' : 'Поделиться номером из Telegram'}
+              </button>
+            </div>
+            {contactError && (
+              <p style={{ marginBottom: '10px', color: 'var(--danger)' }}>{contactError}</p>
+            )}
 
             <div className={`field ${!isValid && phone ? 'invalid' : ''}`} id="fieldPhone">
               <div className="label">Телефон</div>

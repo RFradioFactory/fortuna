@@ -1,0 +1,59 @@
+{
+  "items": [
+    {
+      "id": "10004",
+      "cityFrom": "msc",
+      "cityTo": "spb",
+      "cargoType": "standard",
+      "cargoWeight": "500 кг, 3 коробки",
+      "dateMode": "pick",
+      "selectedDate": "2026-05-12T00:00:00.000Z",
+      "status": "В пути",
+      "createdAt": "2026-05-08T10:30:00.000Z"
+    },
+    {
+      "id": "10002",
+      "cityFrom": "ekb",
+      "cityTo": "kgn",
+      "cargoType": "pallets",
+      "cargoWeight": "8 паллет, ~1200 кг",
+      "dateMode": "asap",
+      "selectedDate": null,
+      "status": "Принята",
+      "createdAt": "2026-05-09T14:15:00.000Z"
+    },
+    {
+      "id": "10005",
+      "cityFrom": "nsk",
+      "cityTo": "krsk",
+      "cargoType": "docs",
+      "cargoWeight": "Конверт, до 1 кг",
+      "dateMode": "pick",
+      "selectedDate": "2026-05-10T00:00:00.000Z",
+      "status": "Доставлена",
+      "createdAt": "2026-05-06T09:45:00.000Z"
+    },
+    {
+      "id": "10001",
+      "cityFrom": "pnz",
+      "cityTo": "vlg",
+      "cargoType": "standard",
+      "cargoWeight": "2 паллеты, 350 кг",
+      "dateMode": "asap",
+      "selectedDate": null,
+      "status": "В обработке",
+      "createdAt": "2026-05-09T16:20:00.000Z"
+    },
+    {
+      "id": "10003",
+      "cityFrom": "rst",
+      "cityTo": "tum",
+      "cargoType": "other",
+      "cargoWeight": "Мебель, 2 куб.м.",
+      "dateMode": "pick",
+      "selectedDate": "2026-05-15T00:00:00.000Z",
+      "status": "Принята",
+      "createdAt": "2026-05-09T11:00:00.000Z"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router';
+import { toggleTheme } from '../../utils/theme';
 
 const MainScreen = () => {
   const navigate = useNavigate();
@@ -7,18 +8,6 @@ const MainScreen = () => {
     navigate('/route');
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
   return (
     <div className="app-container">

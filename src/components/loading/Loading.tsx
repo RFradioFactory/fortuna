@@ -1,35 +1,67 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useInitData } from '@tma.js/sdk-react';
+import { toggleTheme } from '../../utils/theme';
 
 const LoadingScreen = () => {
   const navigate = useNavigate();
-  const [showDemo, setShowDemo] = useState(false);
+  const initData = useInitData();
+  const [error, setError] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Auto transition to main screen after delay (like in demo)
-    const timer = setTimeout(() => {
-      navigate('/main');
-    }, 900);
+    const checkUserStatus = async () => {
+      try {
+        if (!initData) {
+          throw new Error('No init data available');
+        }
 
-    return () => clearTimeout(timer);
-  }, [navigate]);
+        localStorage.setItem('initData', JSON.stringify(initData));
 
-  const handleGoToDemo = () => {
+        // Преобразуем initData в строку для отправки на бекенд
+        const initDataString = JSON.stringify(initData);
+        
+        // Отправляем запрос на бекенд для проверки статуса пользователя
+        // const response = await apiService.initUser(initDataString);
+        const response = (await fetch('./initUser.json'));
+        const data = await response.json();
+
+        // Сохраняем профиль пользователя, если получили от бекенда
+        if (data.userStatus.status) {
+          localStorage.setItem('userStatus', JSON.stringify(data.userStatus));
+        }
+        if (data.userStatus.userData?.userProfile) {
+          localStorage.setItem('userProfile', JSON.stringify(data.userStatus.userData.userProfile));
+        }
+        else localStorage.setItem('userProfile', '');
+
+        // В зависимости от статуса перенаправляем на нужную страницу
+        if (data.userStatus.status === 'new') {
+          navigate('/main');
+        } else if (data.userStatus.status === 'existing') {
+          navigate('/home');
+        }
+      } catch (error) {
+        console.error('Error checking user status:', error);
+        setError('Не удалось загрузить данные');
+        
+        // В случае ошибки можно перейти на главную страницу для демо
+        setTimeout(() => {
+          //navigate('/home');
+          navigate('/main');
+        }, 2000);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkUserStatus();
+  }, [initData, navigate]);
+
+  const handleGoToMain = () => {
     navigate('/main');
   };
 
-  const toggleTheme = () => {
-    const current = document.documentElement.getAttribute('data-theme') || 'auto';
-    const next = current === 'auto' ? 'light' : (current === 'light' ? 'dark' : 'auto');
-    
-    if (next === 'auto') {
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.setAttribute('data-theme', next);
-    }
-    
-    localStorage.setItem('theme_mode', next);
-  };
 
   return (
     <div className="app-container">
@@ -46,13 +78,15 @@ const LoadingScreen = () => {
           <div className="bigicon" style={{fontWeight: 900}}>FE</div>
           <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
             <div style={{fontSize: '18px', fontWeight: 900, letterSpacing: '-.2px'}}>Fortuna Express</div>
-            <div style={{fontSize: '13px', color: 'var(--muted)'}}>Загружаем сервис оформления перевозки…</div>
+            <div style={{fontSize: '13px', color: 'var(--muted)'}}>
+              {error ? error : 'Загрузка приложения…'}
+            </div>
           </div>
           <div className="spinner" aria-hidden="true"></div>
         </div>
 
         <div className="mainButtonWrap">
-          <div className="mainButton" onClick={handleGoToDemo}>Перейти к демо</div>
+          <div className="mainButton" onClick={handleGoToMain}>Перейти к оформлению</div>
         </div>
       </div>
     </div>

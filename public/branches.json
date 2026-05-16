@@ -1,0 +1,136 @@
+{
+  "items": [
+    {
+      "id": "msc",
+      "name": "Филиал Москва",
+      "address": "г. Москва, ул. Тверская, д. 12, стр. 1",
+      "phone": "+7 (495) 123-45-67",
+      "email": "moscow@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 55.7558,
+        "lng": 37.6173
+      }
+    },
+    {
+      "id": "spb",
+      "name": "Филиал Санкт-Петербург",
+      "address": "г. Санкт-Петербург, пр. Невский, д. 90, стр. 2",
+      "phone": "+7 (812) 987-65-43",
+      "email": "spb@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 59.9343,
+        "lng": 30.3351
+      }
+    },
+    {
+      "id": "nsk",
+      "name": "Филиал Новосибирск",
+      "address": "г. Новосибирск, ул. Красный проспект, д. 145, стр. 3",
+      "phone": "+7 (383) 456-78-90",
+      "email": "nsk@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 55.0084,
+        "lng": 82.9357
+      }
+    },
+    {
+      "id": "ekb",
+      "name": "Филиал Екатеринбург",
+      "address": "г. Екатеринбург, ул. Малышева, д. 51, стр. 1",
+      "phone": "+7 (343) 321-54-32",
+      "email": "ekb@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 56.8389,
+        "lng": 60.6057
+      }
+    },
+    {
+      "id": "nnv",
+      "name": "Филиал Нижний Новгород",
+      "address": "г. Нижний Новгород, ул. Большая Покровская, д. 43, стр. 5",
+      "phone": "+7 (831) 234-56-78",
+      "email": "nnv@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 56.2965,
+        "lng": 43.9361
+      }
+    },
+    {
+      "id": "kzn",
+      "name": "Филиал Казань",
+      "address": "г. Казань, ул. Баумана, д. 68, стр. 1",
+      "phone": "+7 (843) 567-89-01",
+      "email": "kzn@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 55.8304,
+        "lng": 49.0661
+      }
+    },
+    {
+      "id": "smr",
+      "name": "Филиал Самара",
+      "address": "г. Самара, ул. Молодогвардейская, д. 144, стр. 2",
+      "phone": "+7 (846) 876-54-32",
+      "email": "smr@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 53.1959,
+        "lng": 50.1002
+      }
+    },
+    {
+      "id": "rostov",
+      "name": "Филиал Ростов-на-Дону",
+      "address": "г. Ростов-на-Дону, ул. Большая Садовая, д. 76, стр. 1",
+      "phone": "+7 (863) 432-10-98",
+      "email": "rostov@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 47.2221,
+        "lng": 39.7188
+      }
+    },
+    {
+      "id": "ufa",
+      "name": "Филиал Уфа",
+      "address": "г. Уфа, ул. Ленина, д. 57, стр. 3",
+      "phone": "+7 (347) 298-76-54",
+      "email": "ufa@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 54.7351,
+        "lng": 55.9587
+      }
+    },
+    {
+      "id": "krasnodar",
+      "name": "Филиал Краснодар",
+      "address": "г. Краснодар, ул. Красная, д. 152, стр. 1",
+      "phone": "+7 (861) 267-43-21",
+      "email": "krasnodar@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 45.0355,
+        "lng": 38.9753
+      }
+    },
+    {
+      "id": "vlg",
+      "name": "Филиал Волгоград",
+      "address": "г. Волгоград, ул. Мира, д. 27, стр. 4",
+      "phone": "+7 (844) 365-87-90",
+      "email": "vlg@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 48.7071,
+        "lng": 44.5035
+      }
+    },
+    {
+      "id": "perm",
+      "name": "Филиал Пермь",
+      "address": "г. Пермь, ул. Ленина, д. 73, стр. 2",
+      "phone": "+7 (342) 234-56-78",
+      "email": "perm@fortunaexpress.ru",
+      "coordinates": {
+        "lat": 58.0104,
+        "lng": 56.2294
+      }
+    }
+  ]
+}
